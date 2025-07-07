@@ -6,6 +6,7 @@ FROM ${BASE_IMAGE}
 ARG PIP_INDEX=https://pypi.org/simple
 ARG EXTRAS=torch-npu,metrics
 ARG HTTP_PROXY=""
+ARG PYTORCH_INDEX=https://download.pytorch.org/whl/cpu
 
 # Define environments
 ENV MAX_JOBS=16
@@ -27,6 +28,10 @@ WORKDIR /app
 RUN pip config set global.index-url "${PIP_INDEX}" && \
     pip config set global.extra-index-url "${PIP_INDEX}" && \
     pip install --no-cache-dir --upgrade pip packaging wheel setuptools
+
+# Install torch-npu
+RUN pip uninstall -y torch torchvision torchaudio && \
+    pip install --no-cache-dir "torch-npu==2.5.1" "torchvision==0.20.1" --index-url "${PYTORCH_INDEX}"
 
 # Install the requirements
 COPY requirements.txt /app
